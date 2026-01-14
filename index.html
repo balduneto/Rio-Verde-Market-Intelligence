@@ -16,7 +16,11 @@ import {
   Trash2,
   RefreshCw,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Lightbulb,
+  MousePointerClick,
+  Edit3,
+  Hand
 } from 'lucide-react';
 import { 
   LineChart,
@@ -37,97 +41,104 @@ import {
  */
 
 const SOURCES = {
-  demografia: "Fonte: IBGE (Censo 2022) e Estimativas Populacionais (2024).",
-  economia: "Fonte: IMB (Instituto Mauro Borges) e IPC Maps (2024).",
-  zoneamento: "Fonte: Plano Diretor de Rio Verde e RAIS (2023).",
-  agro: "Fonte: CONAB (Safra 23/24) e Sindicato Rural de Rio Verde.",
-  periodo: "Ref: Dados consolidados Q4/2024."
+  demografia: "Fonte: IBGE (Censo 2022) e Est. 2024 (238 mil hab).",
+  economia: "Fonte: IBGE 2023 (PIB per Capita R$ 98k) e IMB.",
+  zoneamento: "Fonte: Plano Diretor e Análise Imobiliária Local (Medeiros/Interlagos).",
+  agro: "Fonte: CONAB (Calendário Safra Soja/Milho 23/24).",
+  periodo: "Ref: Dados consolidados para planejamento 2025."
 };
 
 const CITY_STATS = {
-  populacao: "225.696",
-  pibPerCapita: "R$ 98.900",
+  populacao: "238.025",
+  pibPerCapita: "R$ 98.849",
   pibTotal: "R$ 22,3 Bilhões",
-  potencialConsumo: "R$ 7,56 Bilhões"
+  posicaoGoias: "3º Maior PIB"
 };
 
 const ZONES = [
   {
-    id: 'green-park',
-    name: 'Green Park & Solar do Bosque',
-    type: 'Residencial de Luxo (Condomínios)',
-    class: 'A',
-    income: '> 20 S.M.',
-    description: 'O auge da exclusividade. Lotes amplos, arquitetura contemporânea e alta densidade de piscinas privativas.',
-    poolPotential: 95,
-    fitnessPotential: 80,
-    strategy: 'Venda Consultiva & Técnica',
-    poolTip: 'Foco em saúde (pele/cabelo) e sustentabilidade. Eliminação do cheiro de cloro.',
-    fitnessTip: 'Moda de grife, tecidos tecnológicos. Atendimento VIP em domicílio.',
+    id: 'medeiros',
+    name: 'Bairro Medeiros & Interlagos',
+    type: 'Alta Renda / Elite do Agro',
+    class: 'A+',
+    income: '> 30 S.M.',
+    description: 'Conhecido por ter uma das maiores concentrações de renda do Centro-Oeste. Mansões com áreas de lazer extensas e piscinas de grande porte (>50.000L).',
+    poolPotential: 98,
+    fitnessPotential: 85,
+    strategy: 'Exclusividade Total',
+    poolTip: 'Venda o "Sistema Livre de Cloro" como item de saúde indispensável. O cliente não pergunta preço, pergunta se é o melhor.',
+    fitnessTip: 'Atendimento "Bag Delivery" com peças de grife. O foco é a roupa social-fitness para eventos do agronegócio.',
     color: 'bg-emerald-600'
   },
   {
-    id: 'gameleira',
-    name: 'Gameleira & Interlagos',
-    type: 'Bairros Tradicionais / Gentrificação',
-    class: 'B+',
-    income: '10-20 S.M.',
-    description: 'Bairros abertos tradicionais com muitas casas térreas amplas e piscinas familiares.',
-    poolPotential: 85,
-    fitnessPotential: 90,
-    strategy: 'Custo-Benefício & Status',
-    poolTip: 'Argumento de economia operacional (menos gastos mensais com cloro).',
-    fitnessTip: 'Proximidade com clubes. Roupas que transitam do treino para o social.',
+    id: 'morada',
+    name: 'Morada do Sol & Campestre',
+    type: 'Classe Média Alta / Profissionais',
+    class: 'A/B',
+    income: '15-25 S.M.',
+    description: 'Bairros consolidados, próximos aos clubes tradicionais. Público formado por médicos, advogados e agrônomos. Casas com piscinas médias.',
+    poolPotential: 80,
+    fitnessPotential: 95,
+    strategy: 'Status Racional',
+    poolTip: 'Foque na automação. Este cliente trabalha muito e quer a piscina pronta para uso no fim de semana sem esforço.',
+    fitnessTip: 'Kits coordenados (legging + top). Valorizam marcas técnicas reconhecidas pela durabilidade.',
     color: 'bg-blue-600'
   },
   {
     id: 'universitario',
-    name: 'Eixo Universitário / Morada do Sol',
-    type: 'Jovem / Vibrante',
-    class: 'B/C+',
-    income: '5-10 S.M.',
-    description: 'Região de alta densidade de academias e público jovem universitário/recém-formado.',
-    poolPotential: 30,
-    fitnessPotential: 98,
-    strategy: 'Tendência & Volume',
-    poolTip: 'Poucas piscinas residenciais, foco em clubes e academias da região (B2B).',
-    fitnessTip: 'Fast Fashion Fitness. Alta rotatividade de coleções e tendências de Instagram.',
+    name: 'Setor Universitário & Central',
+    type: 'Jovem / Universitário / Dinâmico',
+    class: 'B/C',
+    income: '5-12 S.M.',
+    description: 'Alta densidade vertical e repúblicas. O consumo de piscina é via Clubes e Academias, mas o consumo de moda fitness é explosivo.',
+    poolPotential: 20,
+    fitnessPotential: 99,
+    strategy: 'Fast Fashion & Volume',
+    poolTip: 'Mercado B2B: Venda ionizadores industriais para as academias e clubes da região (Life Club, etc).',
+    fitnessTip: 'Coleções "Capsula" semanais. Influenciadores locais e estética de Instagram são vitais aqui.',
     color: 'bg-purple-600'
   },
   {
-    id: 'flamboyant',
-    name: 'Novos Loteamentos (Flamboyant)',
-    type: 'Expansão Urbana',
-    class: 'B-/C',
-    income: '3-10 S.M.',
-    description: 'Classe média ascendente. Casas novas, lotes menores, piscinas compactas ou SPAs.',
-    poolPotential: 60,
-    fitnessPotential: 75,
-    strategy: 'Acessibilidade & Sonho',
-    poolTip: 'Foco em piscinas compactas e SPAs. Preço sensível, parcelamento.',
-    fitnessTip: 'Moda acessível, foco em durabilidade e estética de "pertencimento".',
+    id: 'promissao',
+    name: 'Promissão & Bairros Populares',
+    type: 'Classe Trabalhadora / Ascendente',
+    class: 'C/D',
+    income: '2-5 S.M.',
+    description: 'A força de trabalho da agroindústria (BRF, Perdigão). Lazer focado em piscinas de plástico/fibra ou clubes associativos.',
+    poolPotential: 40,
+    fitnessPotential: 70,
+    strategy: 'Acessibilidade',
+    poolTip: 'Kits de tratamento simplificado para piscinas de fibra e infláveis de grande porte.',
+    fitnessTip: 'Preço competitivo e facilidade de pagamento. Moda fitness que serve como roupa de dia a dia.',
     color: 'bg-orange-500'
   }
 ];
 
 const SEASONALITY_DATA = [
-  { month: 'Jan', cashflow: 60, event: 'Manutenção', strategy: 'Liquidação Verão' },
-  { month: 'Fev', cashflow: 90, event: 'Colheita Soja', strategy: 'Instalação de Piscinas (Alta Renda)' },
-  { month: 'Mar', cashflow: 100, event: 'Pico Liquidez', strategy: 'Venda Pacotes Anuais Academia' },
-  { month: 'Abr', cashflow: 70, event: 'Entressafra', strategy: 'Coleção Outono' },
+  { month: 'Jan', cashflow: 50, event: 'Manutenção', strategy: 'Liquidação de Estoque' },
+  { month: 'Fev', cashflow: 80, event: 'Início Colheita Soja', strategy: 'Pré-Venda Safra (Tickets Altos)' },
+  { month: 'Mar', cashflow: 100, event: 'Pico Soja (R$)', strategy: 'Lançamento Coleções Premium' },
+  { month: 'Abr', cashflow: 90, event: 'Fim Colheita Soja', strategy: 'Fechamento de Obras/Reformas' },
   { month: 'Mai', cashflow: 60, event: 'Plantio Safrinha', strategy: 'Manutenção Recorrente' },
-  { month: 'Jun', cashflow: 65, event: 'Clima Ameno', strategy: 'Moda Fitness Inverno' },
-  { month: 'Jul', cashflow: 95, event: 'Expo Rio Verde / Milho', strategy: 'Moda "Agro-Fit" / Vitrine Social' },
-  { month: 'Ago', cashflow: 50, event: 'Pós-Festa', strategy: 'Recuperação / Promoções' },
-  { month: 'Set', cashflow: 55, event: 'Plantio Verão', strategy: 'Preparação Verão' },
-  { month: 'Out', cashflow: 60, event: 'Aquecimento', strategy: 'Manutenção Pré-Verão' },
-  { month: 'Nov', cashflow: 80, event: 'Calor / 13º', strategy: 'Químicos e Acessórios' },
-  { month: 'Dez', cashflow: 85, event: 'Festas / Férias', strategy: 'Moda Praia / Presentes' },
+  { month: 'Jun', cashflow: 65, event: 'Expo Rio Verde', strategy: 'Moda "Agro-Chic" para a Festa' },
+  { month: 'Jul', cashflow: 95, event: 'Colheita Milho', strategy: '2ª Onda de Liquidez (Férias)' },
+  { month: 'Ago', cashflow: 70, event: 'Pós-Safra', strategy: 'Promoções de Inverno' },
+  { month: 'Set', cashflow: 50, event: 'Vazio Sanitário', strategy: 'Preparação Verão / Fitness' },
+  { month: 'Out', cashflow: 55, event: 'Plantio Verão', strategy: 'Campanha "Projeto Verão"' },
+  { month: 'Nov', cashflow: 75, event: 'Esquenta Verão', strategy: 'Kits Químicos Piscina' },
+  { month: 'Dez', cashflow: 90, event: '13º + Bônus', strategy: 'Presentes e Reformas Rápidas' },
 ];
 
 /**
- * --- COMPONENTES VISUAIS ---
+ * --- COMPONENTES VISUAIS AUXILIARES ---
  */
+
+const InteractiveBadge = ({ type = "click" }) => (
+  <span className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-200 animate-pulse ml-2">
+    {type === "click" ? <MousePointerClick className="w-3 h-3" /> : <Edit3 className="w-3 h-3" />}
+    {type === "click" ? "Interativo: Clique" : "Interativo: Edite"}
+  </span>
+);
 
 const SourceFooter = ({ source, period }) => (
   <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center text-[10px] text-slate-400 font-medium font-mono gap-2 w-full">
@@ -136,15 +147,29 @@ const SourceFooter = ({ source, period }) => (
   </div>
 );
 
-const SectionIntro = ({ title, icon: Icon, children }) => (
-  <div className="mb-6 bg-white p-4 md:p-5 rounded-lg border-l-4 border-indigo-500 shadow-sm w-full">
-    <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2 mb-3">
-      <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600 flex-shrink-0" />
-      {title}
-    </h2>
-    <div className="text-slate-600 text-xs md:text-sm leading-relaxed text-justify">
-      {children}
+const SectionIntro = ({ title, icon: Icon, children, expertNote, interactiveType }) => (
+  <div className="mb-6 w-full">
+    <div className="bg-white p-4 md:p-5 rounded-lg border-l-4 border-indigo-500 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+          <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600 flex-shrink-0" />
+          {title}
+        </h2>
+        {interactiveType && <InteractiveBadge type={interactiveType} />}
+      </div>
+      <div className="text-slate-600 text-xs md:text-sm leading-relaxed text-justify space-y-2">
+        {children}
+      </div>
     </div>
+    {expertNote && (
+      <div className="mt-2 mx-2 md:mx-4 bg-indigo-50 p-3 rounded-b-lg border border-indigo-100 border-t-0 flex gap-3 items-start">
+        <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+        <div>
+          <span className="block text-[10px] font-bold text-indigo-800 uppercase mb-1">Análise do Especialista</span>
+          <p className="text-xs text-indigo-700 italic leading-relaxed">{expertNote}</p>
+        </div>
+      </div>
+    )}
   </div>
 );
 
@@ -157,7 +182,7 @@ const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
       {tooltip && (
         <div className="relative group/tooltip ml-2">
           <HelpCircle className="w-4 h-4 text-slate-300 cursor-help" />
-          <div className="absolute top-8 right-0 w-40 md:w-48 bg-slate-800 text-white text-[10px] p-2 rounded hidden group-hover/tooltip:block z-30 shadow-xl pointer-events-none">
+          <div className="absolute top-8 right-0 w-48 bg-slate-800 text-white text-[10px] p-3 rounded-lg hidden group-hover/block z-30 shadow-xl pointer-events-none leading-relaxed text-left">
             {tooltip}
           </div>
         </div>
@@ -165,7 +190,7 @@ const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
     </div>
     <div className="mt-4 w-full">
       <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 truncate" title={title}>{title}</h3>
-      <p className="text-xl md:text-2xl font-bold text-slate-800 mt-1 truncate" title={value}>{value}</p>
+      <p className="text-lg md:text-2xl font-bold text-slate-800 mt-1 truncate" title={value}>{value}</p>
       {subtext && <p className="text-[10px] md:text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2 truncate">{subtext}</p>}
     </div>
   </div>
@@ -187,30 +212,26 @@ const ProgressBar = ({ label, value, colorClass }) => (
  * --- SIMULADOR COMPONENT ---
  */
 const BusinessSimulator = () => {
-  // Estado Inicial para CAPEX (Investimento Inicial)
   const [capexItems, setCapexItems] = useState([
-    { id: 1, name: 'Reforma / Ponto', value: 15000 },
-    { id: 2, name: 'Estoque Inicial', value: 30000 },
-    { id: 3, name: 'Marketing Lançamento', value: 5000 },
-    { id: 4, name: 'Equipamentos', value: 10000 },
+    { id: 1, name: 'Reforma / Ponto Comercial', value: 25000 },
+    { id: 2, name: 'Estoque Inicial (Mix)', value: 40000 },
+    { id: 3, name: 'Marketing & Branding', value: 8000 },
+    { id: 4, name: 'Mobiliário e TI', value: 12000 },
   ]);
 
-  // Estado Inicial para OPEX (Custo Fixo Mensal)
   const [opexItems, setOpexItems] = useState([
-    { id: 1, name: 'Aluguel + Cond.', value: 3500 },
-    { id: 2, name: 'Salários + Encargos', value: 4500 },
-    { id: 3, name: 'Internet/Luz/Água', value: 600 },
-    { id: 4, name: 'Marketing Mensal', value: 1000 },
+    { id: 1, name: 'Aluguel (Bairro Nobre)', value: 4500 },
+    { id: 2, name: 'Equipe (2 func + encargos)', value: 6500 },
+    { id: 3, name: 'Energia/Água/Net', value: 800 },
+    { id: 4, name: 'Tráfego Pago (Ads)', value: 1500 },
   ]);
 
-  // Estado para Receita
   const [revenue, setRevenue] = useState({
-    avgTicket: 250, // Ticket Médio
-    volume: 80, // Vendas por mês
-    variableCostPct: 40 // Custo Variável (%) - Custo da Mercadoria Vendida + Impostos
+    avgTicket: 350, 
+    volume: 60, 
+    variableCostPct: 45 
   });
 
-  // Funções Auxiliares
   const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
   
   const addItem = (setter, list) => {
@@ -226,7 +247,6 @@ const BusinessSimulator = () => {
     setter(list.map(item => item.id === id ? { ...item, [field]: field === 'value' ? Number(value) : value } : item));
   };
 
-  // Cálculos Financeiros
   const totalCapex = capexItems.reduce((acc, item) => acc + item.value, 0);
   const totalFixedOpex = opexItems.reduce((acc, item) => acc + item.value, 0);
   
@@ -238,24 +258,29 @@ const BusinessSimulator = () => {
   const paybackMonths = netProfit > 0 ? totalCapex / netProfit : 0;
   const paybackYears = paybackMonths / 12;
 
-  // Gráfico do Simulador
   const simulatorData = [
-    { name: 'Receita Bruta', value: grossRevenue, color: '#22c55e' }, // Green
-    { name: 'Custo Variável', value: variableCost, color: '#f59e0b' }, // Amber
-    { name: 'Custo Fixo', value: totalFixedOpex, color: '#ef4444' }, // Red
-    { name: 'Lucro Líq.', value: netProfit > 0 ? netProfit : 0, color: '#3b82f6' } // Blue
+    { name: 'Receita Bruta', value: grossRevenue, color: '#22c55e' }, 
+    { name: 'Custo Variável', value: variableCost, color: '#f59e0b' }, 
+    { name: 'Custo Fixo', value: totalFixedOpex, color: '#ef4444' }, 
+    { name: 'Lucro Líq.', value: netProfit > 0 ? netProfit : 0, color: '#3b82f6' } 
   ];
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-8 w-full">
       <div className="bg-indigo-900 text-white p-5 flex items-center justify-between">
-        <h3 className="text-lg font-bold flex items-center gap-2">
-          <Calculator className="w-5 h-5 text-green-400" />
-          Simulador de Viabilidade
-        </h3>
+        <div>
+          <h3 className="text-lg font-bold flex items-center gap-2">
+            <Calculator className="w-5 h-5 text-green-400" />
+            Simulador de Viabilidade
+          </h3>
+          <p className="text-[10px] text-indigo-300 mt-1 flex items-center gap-1">
+            <Edit3 className="w-3 h-3" />
+            Preencha os campos abaixo para simular seu cenário
+          </p>
+        </div>
         <button 
           onClick={() => {
-            if(window.confirm("Deseja redefinir os valores para o padrão?")) {
+            if(window.confirm("Deseja redefinir os valores para o padrão do estudo?")) {
                window.location.reload();
             }
           }}
@@ -271,30 +296,34 @@ const BusinessSimulator = () => {
         <div className="space-y-6">
           
           {/* CAPEX */}
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 group focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-indigo-600" />
                 <h4 className="text-sm font-bold text-slate-700 uppercase">CAPEX (Inicial)</h4>
               </div>
-              <button onClick={() => addItem(setCapexItems, capexItems)} className="p-1 hover:bg-slate-200 rounded-full text-indigo-600"><Plus className="w-4 h-4" /></button>
+              <button onClick={() => addItem(setCapexItems, capexItems)} className="p-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-full text-indigo-600 shadow-sm" title="Adicionar Linha"><Plus className="w-4 h-4" /></button>
             </div>
             <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
               {capexItems.map((item) => (
                 <div key={item.id} className="flex gap-2 items-center text-xs">
-                  <input 
-                    type="text" 
-                    value={item.name} 
-                    onChange={(e) => updateItem(setCapexItems, capexItems, item.id, 'name', e.target.value)}
-                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none w-full min-w-0"
-                  />
-                  <div className="relative w-24 shrink-0">
+                  <div className="flex-1 relative">
+                    <Edit3 className="w-3 h-3 text-slate-300 absolute left-2 top-1.5" />
+                    <input 
+                      type="text" 
+                      value={item.name} 
+                      onChange={(e) => updateItem(setCapexItems, capexItems, item.id, 'name', e.target.value)}
+                      className="w-full border border-slate-300 rounded pl-7 pr-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none w-full min-w-0 bg-white"
+                      placeholder="Nome do Item"
+                    />
+                  </div>
+                  <div className="relative w-28 shrink-0">
                     <span className="absolute left-2 top-1 text-slate-400">R$</span>
                     <input 
                       type="number" 
                       value={item.value} 
                       onChange={(e) => updateItem(setCapexItems, capexItems, item.id, 'value', e.target.value)}
-                      className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none"
+                      className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none bg-white focus:ring-1 focus:ring-indigo-500"
                     />
                   </div>
                   <button onClick={() => removeItem(setCapexItems, capexItems, item.id)} className="text-slate-400 hover:text-red-500 shrink-0"><Trash2 className="w-3 h-3" /></button>
@@ -307,30 +336,34 @@ const BusinessSimulator = () => {
           </div>
 
           {/* OPEX */}
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 group focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
              <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <RefreshCw className="w-4 h-4 text-orange-600" />
                 <h4 className="text-sm font-bold text-slate-700 uppercase">OPEX (Mensal)</h4>
               </div>
-              <button onClick={() => addItem(setOpexItems, opexItems)} className="p-1 hover:bg-slate-200 rounded-full text-indigo-600"><Plus className="w-4 h-4" /></button>
+              <button onClick={() => addItem(setOpexItems, opexItems)} className="p-1 bg-white hover:bg-indigo-50 border border-slate-200 rounded-full text-indigo-600 shadow-sm" title="Adicionar Linha"><Plus className="w-4 h-4" /></button>
             </div>
             <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
               {opexItems.map((item) => (
                 <div key={item.id} className="flex gap-2 items-center text-xs">
-                  <input 
-                    type="text" 
-                    value={item.name} 
-                    onChange={(e) => updateItem(setOpexItems, opexItems, item.id, 'name', e.target.value)}
-                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none w-full min-w-0"
-                  />
-                  <div className="relative w-24 shrink-0">
+                   <div className="flex-1 relative">
+                    <Edit3 className="w-3 h-3 text-slate-300 absolute left-2 top-1.5" />
+                    <input 
+                      type="text" 
+                      value={item.name} 
+                      onChange={(e) => updateItem(setOpexItems, opexItems, item.id, 'name', e.target.value)}
+                      className="w-full border border-slate-300 rounded pl-7 pr-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none w-full min-w-0 bg-white"
+                      placeholder="Nome do Item"
+                    />
+                  </div>
+                  <div className="relative w-28 shrink-0">
                     <span className="absolute left-2 top-1 text-slate-400">R$</span>
                     <input 
                       type="number" 
                       value={item.value} 
                       onChange={(e) => updateItem(setOpexItems, opexItems, item.id, 'value', e.target.value)}
-                      className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none"
+                      className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none bg-white focus:ring-1 focus:ring-indigo-500"
                     />
                   </div>
                   <button onClick={() => removeItem(setOpexItems, opexItems, item.id)} className="text-slate-400 hover:text-red-500 shrink-0"><Trash2 className="w-3 h-3" /></button>
@@ -340,38 +373,47 @@ const BusinessSimulator = () => {
           </div>
 
           {/* VARIÁVEIS DE VENDA */}
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 group focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
              <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="w-4 h-4 text-green-600" />
                 <h4 className="text-sm font-bold text-slate-700 uppercase">Projeção de Vendas</h4>
              </div>
              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-               <div>
+               <div className="relative">
                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Ticket Médio (R$)</label>
-                 <input 
-                    type="number" 
-                    value={revenue.avgTicket} 
-                    onChange={(e) => setRevenue({...revenue, avgTicket: Number(e.target.value)})}
-                    className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm"
-                  />
+                 <div className="relative">
+                    <Edit3 className="w-3 h-3 text-slate-300 absolute left-2 top-2" />
+                    <input 
+                        type="number" 
+                        value={revenue.avgTicket} 
+                        onChange={(e) => setRevenue({...revenue, avgTicket: Number(e.target.value)})}
+                        className="w-full border border-slate-300 rounded pl-7 pr-2 py-1.5 text-sm bg-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                    />
+                 </div>
                </div>
                <div>
                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Qtd. Vendas/Mês</label>
-                 <input 
-                    type="number" 
-                    value={revenue.volume} 
-                    onChange={(e) => setRevenue({...revenue, volume: Number(e.target.value)})}
-                    className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm"
-                  />
+                  <div className="relative">
+                    <Edit3 className="w-3 h-3 text-slate-300 absolute left-2 top-2" />
+                    <input 
+                        type="number" 
+                        value={revenue.volume} 
+                        onChange={(e) => setRevenue({...revenue, volume: Number(e.target.value)})}
+                        className="w-full border border-slate-300 rounded pl-7 pr-2 py-1.5 text-sm bg-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                    />
+                  </div>
                </div>
                <div>
                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Custo Variável (%)</label>
-                 <input 
-                    type="number" 
-                    value={revenue.variableCostPct} 
-                    onChange={(e) => setRevenue({...revenue, variableCostPct: Number(e.target.value)})}
-                    className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm"
-                  />
+                  <div className="relative">
+                    <Edit3 className="w-3 h-3 text-slate-300 absolute left-2 top-2" />
+                    <input 
+                        type="number" 
+                        value={revenue.variableCostPct} 
+                        onChange={(e) => setRevenue({...revenue, variableCostPct: Number(e.target.value)})}
+                        className="w-full border border-slate-300 rounded pl-7 pr-2 py-1.5 text-sm bg-white focus:ring-1 focus:ring-indigo-500 outline-none"
+                    />
+                  </div>
                </div>
              </div>
           </div>
@@ -432,7 +474,7 @@ const BusinessSimulator = () => {
                <span className="text-xs font-bold text-indigo-600 uppercase">Payback Estimado</span>
                <div className="group relative">
                  <HelpCircle className="w-3 h-3 text-slate-400 cursor-help" />
-                 <div className="absolute bottom-full right-0 w-48 bg-slate-800 text-white text-[9px] p-2 rounded hidden group-hover:block mb-2 z-50">
+                 <div className="absolute bottom-full right-0 w-48 bg-slate-800 text-white text-[9px] p-2 rounded hidden group-hover/block mb-2 z-50">
                    Tempo necessário para recuperar o CAPEX com base no Lucro Líquido atual.
                  </div>
                </div>
@@ -456,7 +498,7 @@ const BusinessSimulator = () => {
       </div>
       
       <div className="bg-slate-100 p-3 text-[10px] text-slate-500 text-center border-t border-slate-200">
-        * Simulação simplificada para fins didáticos. Não substitui plano de negócios formal. Impostos considerados no Custo Variável.
+        * Simulação simplificada para fins didáticos. Valores padrão baseados na média de mercado local (2024).
       </div>
     </div>
   );
@@ -482,7 +524,7 @@ export default function RioVerdeMarketApp() {
             <div className="w-full md:w-auto">
               <div className="flex items-center gap-2 mb-2">
                 <span className="bg-green-400 text-indigo-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Mapeamento Sócio-Econômico
+                  Mapeamento Sócio-Econômico 2025
                 </span>
               </div>
               <h1 className="text-2xl md:text-4xl font-bold flex flex-wrap items-center gap-2 leading-tight">
@@ -490,15 +532,15 @@ export default function RioVerdeMarketApp() {
                 <span className="block w-full md:w-auto md:inline text-indigo-200 text-lg md:text-3xl font-light">| Rio Verde (GO)</span>
               </h1>
               <p className="text-indigo-200 mt-2 w-full md:max-w-2xl text-xs md:text-sm leading-relaxed">
-                Estudo interativo: <strong>Ionizadores de Piscina</strong> e <strong>Moda Fitness</strong> x Renda e Safra.
+                Estudo interativo: <strong>Ionizadores de Piscina</strong> e <strong>Moda Fitness</strong> cruzados com dados oficiais do Censo e da Safra.
               </p>
             </div>
             
             {/* KPI Destaque Header */}
             <div className="w-full md:w-auto mt-2 md:mt-0 bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/10 flex md:block items-center justify-between">
               <div className="text-left md:text-right">
-                <div className="text-[10px] text-indigo-200 uppercase tracking-widest mb-1">Destaque Nacional</div>
-                <div className="text-[10px] text-white">PIB per Capita (IMB 2024)</div>
+                <div className="text-[10px] text-indigo-200 uppercase tracking-widest mb-1">Destaque Nacional (IBGE 23)</div>
+                <div className="text-[10px] text-white">PIB per Capita</div>
               </div>
               <div className="text-2xl md:text-3xl font-bold text-green-400 md:mt-1 pl-4 border-l border-white/20 md:border-l-0 md:pl-0">
                 {CITY_STATS.pibPerCapita}
@@ -512,42 +554,49 @@ export default function RioVerdeMarketApp() {
         
         {/* SEÇÃO 1: MACRO */}
         <section className="w-full">
-          <SectionIntro title="Panorama Macroeconômico e Demográfico" icon={BookOpen}>
-            <p className="mb-2">
-              <strong>Contextualização Didática:</strong> O "Tamanho do Prêmio" (TAM). Antes de definir <em>onde</em> vender, validamos a capacidade de compra. 
-              Rio Verde possui uma classe média robusta, impulsionada pelo Agro, com alta propensão ao consumo de bem-estar.
+          <SectionIntro 
+            title="Panorama Macroeconômico e Demográfico" 
+            icon={BookOpen}
+            expertNote="Rio Verde não é apenas uma cidade rica; é uma cidade 'líquida'. A riqueza circula rápido devido aos pagamentos de safra, gerando picos de consumo que cidades industriais não possuem."
+          >
+            <p>
+              <strong>Entendendo os Números:</strong> Com uma população estimada em <strong>{CITY_STATS.populacao}</strong> habitantes (Censo 2022/Est. 2024), a cidade se comporta como uma capital regional. 
+              O dado mais impressionante é o <strong>PIB per Capita de quase R$ 100 mil</strong>. Para comparação, a média nacional gira em torno de R$ 35 mil.
+            </p>
+            <p>
+              Isso significa que, estatisticamente, cada habitante de Rio Verde "produz" 3x mais riqueza que a média brasileira, criando um solo fértil para produtos de <strong>ticket alto (como piscinas)</strong> e <strong>consumo de status (moda)</strong>.
             </p>
           </SectionIntro>
           
           <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <MainCard 
-                title="População Estimada" 
+                title="População (Censo 22)" 
                 value={CITY_STATS.populacao} 
                 icon={Users} 
-                subtext="Predominância: 20-55 anos (PEA)"
-                tooltip="Base populacional economicamente ativa. Fundamental para mercado de academias."
+                subtext="238.025 (Est. 2024)"
+                tooltip="População atualizada. O crescimento populacional acelerado demanda novos condomínios e academias."
               />
               <MainCard 
-                title="Potencial de Consumo" 
-                value={CITY_STATS.potencialConsumo} 
+                title="PIB Total (R$)" 
+                value={CITY_STATS.pibTotal} 
                 icon={DollarSign} 
-                subtext="4º Maior Mercado de GO"
-                tooltip="IPC Maps: Volume total disponível para gastos das famílias no ano."
+                subtext={CITY_STATS.posicaoGoias}
+                tooltip="Soma de todas as riquezas produzidas. O 3º maior de Goiás, atrás apenas de Goiânia e Anápolis."
               />
               <MainCard 
                 title="Público Piscinas" 
-                value="Classe A/B" 
+                value="Classe A+" 
                 icon={Droplets} 
-                subtext="Alta densidade horizontal"
-                tooltip="Condomínios horizontais são o foco para venda de tecnologia (Íons)."
+                subtext="Bairros Medeiros/Interlagos"
+                tooltip="Foco nos bairros onde os terrenos ultrapassam 450m², permitindo piscinas de grande porte."
               />
               <MainCard 
                 title="Público Fitness" 
                 value="Multiclasse" 
                 icon={Dumbbell} 
-                subtext="Adesão cultural elevada"
-                tooltip="O mercado fitness atravessa todas as classes, variando apenas o ticket."
+                subtext="Cultura de 'Corpo Saudável'"
+                tooltip="Rio Verde possui alta densidade de academias por habitante, impulsionada pela cultura jovem universitária."
               />
             </div>
             <SourceFooter source={`${SOURCES.demografia} | ${SOURCES.economia}`} />
@@ -556,13 +605,19 @@ export default function RioVerdeMarketApp() {
 
         {/* SEÇÃO 2: GEOGRAFIA (GRID RESPONSIVO) */}
         <section className="w-full">
-          <SectionIntro title="Geografia do Consumo (Zoneamento)" icon={MapPin}>
-            <p className="mb-2">
-              <strong>Clusterização Inteligente:</strong> Dividimos a cidade em zonas de calor baseadas na renda.
-              Cada zona exige uma abordagem: a <strong>Zona A</strong> busca exclusividade tecnológica; a <strong>Zona C</strong> busca estética e pertencimento.
+          <SectionIntro 
+            title="Geografia do Consumo (Zoneamento Real)" 
+            icon={MapPin}
+            interactiveType="click"
+            expertNote="Não tente vender 'preço' no Bairro Medeiros, venda 'tecnologia'. Lá, a piscina é um item de decoração e status. Já no Universitário, a moda fitness é uniforme diário."
+          >
+            <p>
+              <strong>Mapeamento de Bairros Reais:</strong> Utilizamos dados imobiliários locais para segmentar a cidade. 
+              Identificamos o <strong>Bairro Medeiros</strong> como o epicentro da classe alta (Muitos produtores rurais residem aqui), enquanto o <strong>Setor Universitário</strong> concentra o público jovem consumidor de moda rápida.
             </p>
-            <p className="text-xs text-indigo-800 bg-indigo-50 px-3 py-2 rounded inline-block mt-2 w-full md:w-auto">
-              <span className="font-bold">Interação:</span> Clique nos bairros abaixo para ver o Pitch de Vendas.
+             <p className="text-xs text-indigo-600 font-semibold mt-2 flex items-center gap-1">
+              <Hand className="w-3 h-3 animate-bounce" />
+              Dica: Clique nos cartões abaixo para ver os detalhes de cada bairro.
             </p>
           </SectionIntro>
 
@@ -570,8 +625,8 @@ export default function RioVerdeMarketApp() {
             {/* ESQUERDA: MAPA LÓGICO */}
             <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col order-2 lg:order-1">
               <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                   Selecione a Região
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                   Selecione a Zona <MousePointerClick className="w-3 h-3 text-indigo-400" />
                 </span>
                 
                 {/* Filtros Mobile: Flex Wrap para não quebrar layout */}
@@ -582,7 +637,7 @@ export default function RioVerdeMarketApp() {
                       onClick={() => setFilterClass(cls)}
                       className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold rounded-full transition-colors text-center ${
                         filterClass === cls 
-                          ? 'bg-indigo-600 text-white shadow-md' 
+                          ? 'bg-indigo-600 text-white shadow-md ring-2 ring-indigo-200' 
                           : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'
                       }`}
                     >
@@ -682,10 +737,14 @@ export default function RioVerdeMarketApp() {
 
         {/* SEÇÃO 3: SAZONALIDADE */}
         <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6 mb-8 w-full">
-          <SectionIntro title="Sazonalidade Financeira (O Ciclo do Agro)" icon={Calendar}>
-            <p className="mb-2">
-              <strong>A importância do Timing:</strong> Em Rio Verde, a liquidez do mercado é ditada pelas safras de Soja (Fev/Mar) e Milho (Jul/Ago). 
-              Entender este gráfico é vital para gestão de estoque.
+          <SectionIntro 
+            title="Sazonalidade Financeira (Calendário Safra)" 
+            icon={Calendar}
+            expertNote="Atenção aos meses de Março e Julho. É quando os pagamentos das safras de Soja e Milho (respectivamente) caem na conta dos produtores, irrigando todo o comércio local."
+          >
+            <p>
+              <strong>O "Pulso" do Dinheiro:</strong> Diferente de capitais que dependem de salários mensais, Rio Verde tem injeções massivas de capital duas vezes ao ano.
+              O gráfico abaixo mostra a correlação direta entre a <strong>Colheita da Soja (Q1)</strong> e o <strong>Milho Safrinha (Q3)</strong> com a disponibilidade de caixa.
             </p>
           </SectionIntro>
 
@@ -735,15 +794,20 @@ export default function RioVerdeMarketApp() {
 
         {/* SEÇÃO 4: SIMULADOR DE NEGÓCIOS (NOVO) */}
         <section className="w-full">
-          <SectionIntro title="Modele seu Negócio (Simulador de Viabilidade)" icon={Calculator}>
+          <SectionIntro 
+            title="Modele seu Negócio (Simulador de Viabilidade)" 
+            icon={Calculator}
+            interactiveType="edit"
+            expertNote="Ajustamos os valores padrão para a realidade de Rio Verde (Aluguéis e Salários de 2024). Note como o OPEX (Custo Fixo) impacta o lucro final."
+          >
             <p>
-              <strong>Didática Financeira:</strong> Use esta ferramenta para projetar a saúde financeira do seu negócio em Rio Verde.
+              <strong>Como usar esta ferramenta:</strong> Insira os custos estimados para abrir seu negócio.
+              Os valores pré-carregados refletem um quiosque de shopping ou pequena loja de rua em bairros nobres (Zona A/B).
             </p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-500 text-xs md:text-sm">
-              <li><strong>CAPEX (Capital Expenditure):</strong> Dinheiro que você gasta <em>uma vez</em> para abrir o negócio (Reformas, Equipamentos).</li>
-              <li><strong>OPEX (Operational Expenditure):</strong> Dinheiro que você gasta <em>todo mês</em> para manter as portas abertas (Aluguel, Luz, Pessoal).</li>
-              <li><strong>Payback:</strong> Tempo (em meses) que o lucro do negócio leva para "pagar" o investimento inicial.</li>
-            </ul>
+             <p className="text-xs text-indigo-600 font-semibold mt-2 flex items-center gap-1">
+              <Edit3 className="w-3 h-3 animate-pulse" />
+              Dica: Os campos com ícone de lápis são editáveis. Clique para digitar.
+            </p>
           </SectionIntro>
           
           <BusinessSimulator />
