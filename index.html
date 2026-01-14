@@ -1,0 +1,466 @@
+import React, { useState } from 'react';
+import { 
+  MapPin, 
+  Droplets, 
+  Dumbbell, 
+  TrendingUp, 
+  Users, 
+  DollarSign, 
+  Sun, 
+  Calendar,
+  Info,
+  CheckCircle,
+  Target,
+  BookOpen,
+  HelpCircle,
+  FileText,
+  Menu,
+  ChevronDown
+} from 'lucide-react';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  Legend
+} from 'recharts';
+
+// --- DADOS E FONTES CONSOLIDADOS ---
+// Estrutura de dados imutável para garantir integridade das referências
+
+const SOURCES = {
+  demografia: "Fonte: IBGE (Censo 2022) e Estimativas Populacionais (2024).",
+  economia: "Fonte: IMB (Instituto Mauro Borges) e IPC Maps (2024).",
+  zoneamento: "Fonte: Plano Diretor de Rio Verde e RAIS (Relação Anual de Informações Sociais 2023).",
+  agro: "Fonte: CONAB (Calendário de Safra 23/24) e Sindicato Rural de Rio Verde.",
+  periodo: "Ref: Dados consolidados Q4/2024."
+};
+
+const CITY_STATS = {
+  populacao: "225.696",
+  pibPerCapita: "R$ 98.900",
+  pibTotal: "R$ 22,3 Bilhões",
+  potencialConsumo: "R$ 7,56 Bilhões"
+};
+
+const ZONES = [
+  {
+    id: 'green-park',
+    name: 'Green Park & Solar do Bosque',
+    type: 'Residencial de Luxo (Condomínios)',
+    class: 'A',
+    income: '> 20 S.M.',
+    description: 'O auge da exclusividade. Lotes amplos, arquitetura contemporânea e alta densidade de piscinas privativas.',
+    poolPotential: 95,
+    fitnessPotential: 80,
+    strategy: 'Venda Consultiva & Técnica',
+    poolTip: 'Foco em saúde (pele/cabelo) e sustentabilidade. Eliminação do cheiro de cloro.',
+    fitnessTip: 'Moda de grife, tecidos tecnológicos. Atendimento VIP em domicílio.',
+    color: 'bg-emerald-600'
+  },
+  {
+    id: 'gameleira',
+    name: 'Gameleira & Interlagos',
+    type: 'Bairros Tradicionais / Gentrificação',
+    class: 'B+',
+    income: '10-20 S.M.',
+    description: 'Bairros abertos tradicionais com muitas casas térreas amplas e piscinas familiares.',
+    poolPotential: 85,
+    fitnessPotential: 90,
+    strategy: 'Custo-Benefício & Status',
+    poolTip: 'Argumento de economia operacional (menos gastos mensais com cloro).',
+    fitnessTip: 'Proximidade com clubes. Roupas que transitam do treino para o social.',
+    color: 'bg-blue-600'
+  },
+  {
+    id: 'universitario',
+    name: 'Eixo Universitário / Morada do Sol',
+    type: 'Jovem / Vibrante',
+    class: 'B/C+',
+    income: '5-10 S.M.',
+    description: 'Região de alta densidade de academias e público jovem universitário/recém-formado.',
+    poolPotential: 30,
+    fitnessPotential: 98,
+    strategy: 'Tendência & Volume',
+    poolTip: 'Poucas piscinas residenciais, foco em clubes e academias da região (B2B).',
+    fitnessTip: 'Fast Fashion Fitness. Alta rotatividade de coleções e tendências de Instagram.',
+    color: 'bg-purple-600'
+  },
+  {
+    id: 'flamboyant',
+    name: 'Novos Loteamentos (Flamboyant)',
+    type: 'Expansão Urbana',
+    class: 'B-/C',
+    income: '3-10 S.M.',
+    description: 'Classe média ascendente. Casas novas, lotes menores, piscinas compactas ou SPAs.',
+    poolPotential: 60,
+    fitnessPotential: 75,
+    strategy: 'Acessibilidade & Sonho',
+    poolTip: 'Foco em piscinas compactas e SPAs. Preço sensível, parcelamento.',
+    fitnessTip: 'Moda acessível, foco em durabilidade e estética de "pertencimento".',
+    color: 'bg-orange-500'
+  }
+];
+
+const SEASONALITY_DATA = [
+  { month: 'Jan', cashflow: 60, event: 'Manutenção', strategy: 'Liquidação Verão' },
+  { month: 'Fev', cashflow: 90, event: 'Colheita Soja', strategy: 'Instalação de Piscinas (Alta Renda)' },
+  { month: 'Mar', cashflow: 100, event: 'Pico Liquidez', strategy: 'Venda Pacotes Anuais Academia' },
+  { month: 'Abr', cashflow: 70, event: 'Entressafra', strategy: 'Coleção Outono' },
+  { month: 'Mai', cashflow: 60, event: 'Plantio Safrinha', strategy: 'Manutenção Recorrente' },
+  { month: 'Jun', cashflow: 65, event: 'Clima Ameno', strategy: 'Moda Fitness Inverno' },
+  { month: 'Jul', cashflow: 95, event: 'Expo Rio Verde / Milho', strategy: 'Moda "Agro-Fit" / Vitrine Social' },
+  { month: 'Ago', cashflow: 50, event: 'Pós-Festa', strategy: 'Recuperação / Promoções' },
+  { month: 'Set', cashflow: 55, event: 'Plantio Verão', strategy: 'Preparação Verão' },
+  { month: 'Out', cashflow: 60, event: 'Aquecimento', strategy: 'Manutenção Pré-Verão' },
+  { month: 'Nov', cashflow: 80, event: 'Calor / 13º', strategy: 'Químicos e Acessórios' },
+  { month: 'Dez', cashflow: 85, event: 'Festas / Férias', strategy: 'Moda Praia / Presentes' },
+];
+
+// --- COMPONENTES VISUAIS REUTILIZÁVEIS E RESPONSIVOS ---
+
+const SourceFooter = ({ source, period }) => (
+  <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center text-[10px] text-slate-400 font-medium font-mono gap-2">
+    <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> {source}</span>
+    <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500 whitespace-nowrap">{period || SOURCES.periodo}</span>
+  </div>
+);
+
+const SectionIntro = ({ title, icon: Icon, children }) => (
+  <div className="mb-6 bg-white p-5 rounded-lg border-l-4 border-indigo-500 shadow-sm">
+    <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2 mb-3">
+      <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600 flex-shrink-0" />
+      {title}
+    </h2>
+    <div className="text-slate-600 text-xs md:text-sm leading-relaxed max-w-none md:max-w-4xl text-justify">
+      {children}
+    </div>
+  </div>
+);
+
+const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
+  <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between h-full relative group hover:shadow-md transition-shadow">
+    <div className="flex items-start justify-between">
+      <div className="p-3 bg-indigo-50 rounded-lg">
+        <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
+      </div>
+      {tooltip && (
+        <div className="relative group/tooltip">
+          <HelpCircle className="w-4 h-4 text-slate-300 cursor-help" />
+          {/* Tooltip adaptado para mobile (esquerda) e desktop (direita) */}
+          <div className="absolute top-full right-0 mt-2 w-48 bg-slate-800 text-white text-[10px] p-2 rounded hidden group-hover/tooltip:block z-10 shadow-xl pointer-events-none">
+            {tooltip}
+          </div>
+        </div>
+      )}
+    </div>
+    <div className="mt-4">
+      <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500">{title}</h3>
+      <p className="text-xl md:text-2xl font-bold text-slate-800 mt-1">{value}</p>
+      {subtext && <p className="text-[10px] md:text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2">{subtext}</p>}
+    </div>
+  </div>
+);
+
+const ProgressBar = ({ label, value, colorClass }) => (
+  <div className="mb-4">
+    <div className="flex justify-between mb-1">
+      <span className="text-xs md:text-sm font-medium text-slate-700">{label}</span>
+      <span className="text-xs md:text-sm font-medium text-slate-700">{value}%</span>
+    </div>
+    <div className="w-full bg-slate-200 rounded-full h-2">
+      <div className={`h-2 rounded-full ${colorClass}`} style={{ width: `${value}%` }}></div>
+    </div>
+  </div>
+);
+
+export default function RioVerdeMarketApp() {
+  const [activeZone, setActiveZone] = useState(ZONES[0]);
+  const [filterClass, setFilterClass] = useState('all');
+
+  const filteredZones = filterClass === 'all' 
+    ? ZONES 
+    : ZONES.filter(z => z.class.includes(filterClass));
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-8 md:pb-12">
+      
+      {/* HEADER RESPONSIVO */}
+      <header className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white p-6 md:p-8 shadow-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="bg-green-400 text-indigo-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Mapeamento Sócio-Econômico
+                </span>
+              </div>
+              <h1 className="text-2xl md:text-4xl font-bold flex items-center gap-2 md:gap-3 leading-tight">
+                Inteligência de Mercado: <br className="md:hidden" /> Rio Verde (GO)
+              </h1>
+              <p className="text-indigo-200 mt-2 max-w-2xl text-xs md:text-sm leading-relaxed">
+                Um estudo de caso interativo sobre o consumo de <strong>Ionizadores de Piscina</strong> e <strong>Moda Fitness</strong>, cruzando dados de renda, demografia e sazonalidade do agronegócio.
+              </p>
+            </div>
+            
+            {/* KPI Destaque Header - Adaptado para Mobile */}
+            <div className="w-full md:w-auto mt-2 md:mt-0 bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/10 flex md:block items-center justify-between md:text-right">
+              <div className="text-left md:text-right">
+                <div className="text-[10px] text-indigo-200 uppercase tracking-widest mb-1">Destaque Nacional</div>
+                <div className="text-[10px] text-white">PIB per Capita (IMB 2024)</div>
+              </div>
+              <div className="text-2xl md:text-3xl font-bold text-green-400 md:mt-1 pl-4 border-l border-white/20 md:border-l-0 md:pl-0">
+                {CITY_STATS.pibPerCapita}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 md:space-y-12">
+        
+        {/* SEÇÃO 1: CONTEXTO MACROECONÔMICO */}
+        <section>
+          <SectionIntro title="Panorama Macroeconômico e Demográfico" icon={BookOpen}>
+            <p className="mb-2">
+              <strong>Contextualização Didática:</strong> Antes de definirmos <em>onde</em> vender, precisamos entender o <em>tamanho do prêmio</em> (TAM - Total Addressable Market). 
+              Os dados abaixo não são números aleatórios; eles comprovam a robustez financeira de Rio Verde.
+            </p>
+            <p>
+              O alto PIB per capita, impulsionado pelo agronegócio, cria uma classe média expandida com alta propensão ao consumo de itens de bem-estar (piscinas) e estética (fitness), tornando a cidade um "oásis" de consumo no Centro-Oeste.
+            </p>
+          </SectionIntro>
+          
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
+            {/* Grid adaptável: 1 coluna no celular, 2 no tablet, 4 no desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <MainCard 
+                title="População Estimada" 
+                value={CITY_STATS.populacao} 
+                icon={Users} 
+                subtext="Predominância: 20-55 anos (PEA)"
+                tooltip="Refere-se ao total de habitantes residentes fixos. Uma PEA (População Economicamente Ativa) jovem impulsiona o mercado fitness."
+              />
+              <MainCard 
+                title="Potencial de Consumo" 
+                value={CITY_STATS.potencialConsumo} 
+                icon={DollarSign} 
+                subtext="4º Maior Mercado de Goiás"
+                tooltip="IPC (Índice de Potencial de Consumo): Valor monetário total disponível para gastos das famílias no ano."
+              />
+              <MainCard 
+                title="Público-Alvo Piscinas" 
+                value="Classe A/B" 
+                icon={Droplets} 
+                subtext="Alta densidade horizontal"
+                tooltip="Forte presença de condomínios horizontais fechados favorece a venda de tecnologia para tratamento de água."
+              />
+              <MainCard 
+                title="Público Fitness" 
+                value="Multiclasse" 
+                icon={Dumbbell} 
+                subtext="Adesão cultural elevada"
+                tooltip="O 'corpo' é um ativo social em Rio Verde. O mercado fitness atravessa todas as classes, variando apenas o ticket médio."
+              />
+            </div>
+            <SourceFooter source={`${SOURCES.demografia} | ${SOURCES.economia}`} />
+          </div>
+        </section>
+
+        {/* SEÇÃO 2: GEOGRAFIA INTELIGENTE */}
+        <section>
+          <SectionIntro title="Geografia do Consumo (Zoneamento Sócio-Econômico)" icon={MapPin}>
+            <p className="mb-2">
+              <strong>Como interpretar este mapa?</strong> Rio Verde não é homogênea. Para ser eficiente, aplicamos o conceito de <em>Clusterização</em>.
+              Dividimos a cidade em zonas baseadas na renda média e estilo de vida.
+            </p>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-500 text-xs md:text-sm">
+              <li><strong>Zonas A/B:</strong> Foco em tecnologia, conforto e exclusividade (Piscinas).</li>
+              <li><strong>Zonas B/C:</strong> Foco em tendências, pertencimento e custo-benefício (Moda Fitness).</li>
+            </ul>
+            <p className="text-xs text-indigo-800 bg-indigo-50 px-3 py-2 rounded inline-block mt-3 border border-indigo-100 w-full md:w-auto">
+              <span className="font-bold">Interação:</span> Clique nos cartões dos bairros abaixo para revelar o Pitch de Vendas ideal.
+            </p>
+          </SectionIntro>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            {/* ESQUERDA: SELETOR DE ZONAS */}
+            <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col order-2 lg:order-1">
+              <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                   Selecione a Região
+                </span>
+                
+                {/* Filtros Mobile-Friendly: Wrap flexível */}
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                  {['all', 'A', 'B', 'C'].map((cls) => (
+                    <button
+                      key={cls}
+                      onClick={() => setFilterClass(cls)}
+                      className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-bold rounded-full transition-colors text-center ${
+                        filterClass === cls 
+                          ? 'bg-indigo-600 text-white shadow-md' 
+                          : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'
+                      }`}
+                    >
+                      {cls === 'all' ? 'TODOS' : `CLASSE ${cls}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="p-4 md:p-6 bg-slate-50 relative flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                  {filteredZones.map((zone) => (
+                    <button
+                      key={zone.id}
+                      onClick={() => setActiveZone(zone)}
+                      className={`relative p-4 md:p-5 rounded-xl border-2 text-left transition-all duration-300 group ${
+                        activeZone.id === zone.id 
+                          ? 'border-indigo-600 bg-white shadow-lg ring-1 ring-indigo-100 transform scale-[1.02]' 
+                          : 'border-white bg-white hover:border-indigo-300 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className={`w-3 h-3 rounded-full ${zone.color}`} title="Identificador de Zona"></div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200">
+                          Renda: {zone.income}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-slate-800 text-sm group-hover:text-indigo-700">{zone.name}</h3>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2">{zone.type}</p>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-6 md:mt-8">
+                    <SourceFooter source={SOURCES.zoneamento} />
+                </div>
+              </div>
+            </div>
+
+            {/* DIREITA: PAINEL DE DETALHES (Fixo em desktop, scroll em mobile) */}
+            <div className="bg-white rounded-xl shadow-lg border border-indigo-100 p-5 md:p-6 flex flex-col relative overflow-hidden h-full order-1 lg:order-2">
+              <div className={`absolute top-0 left-0 w-full h-1.5 ${activeZone.color}`} />
+              
+              <div className="mb-6">
+                <h2 className="text-lg md:text-xl font-bold text-slate-800 leading-tight">{activeZone.name}</h2>
+                <div className="flex items-center gap-2 mt-2 mb-3">
+                  <span className="text-[10px] font-semibold text-indigo-800 bg-indigo-50 px-2 py-1 rounded border border-indigo-100">
+                    S.M. = Salários Mínimos
+                  </span>
+                </div>
+                <p className="text-slate-600 text-xs md:text-sm leading-relaxed italic border-l-2 border-slate-200 pl-3">"{activeZone.description}"</p>
+              </div>
+
+              <div className="space-y-6 flex-1">
+                {/* Potencial Metres */}
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Aderência ao Produto</h3>
+                    <Info className="w-3 h-3 text-slate-300" />
+                  </div>
+                  <ProgressBar 
+                    label="Tratamento (Íons)" 
+                    value={activeZone.poolPotential} 
+                    colorClass="bg-blue-500" 
+                  />
+                  <ProgressBar 
+                    label="Moda Fitness" 
+                    value={activeZone.fitnessPotential} 
+                    colorClass="bg-pink-500" 
+                  />
+                </div>
+
+                {/* Estratégia de Ação */}
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 mb-3">
+                    <Target className="w-4 h-4 text-red-500" />
+                    Estratégia Recomendada
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex flex-col gap-2 p-3 bg-blue-50/80 border border-blue-100 rounded-lg text-sm text-blue-900">
+                      <div className="flex items-center gap-2 font-bold text-xs uppercase text-blue-700">
+                        <Droplets className="w-3 h-3" /> Piscinas
+                      </div>
+                      <p className="text-xs md:text-sm">{activeZone.poolTip}</p>
+                    </div>
+                    <div className="flex flex-col gap-2 p-3 bg-pink-50/80 border border-pink-100 rounded-lg text-sm text-pink-900">
+                      <div className="flex items-center gap-2 font-bold text-xs uppercase text-pink-700">
+                        <Dumbbell className="w-3 h-3" /> Fitness
+                      </div>
+                      <p className="text-xs md:text-sm">{activeZone.fitnessTip}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SEÇÃO 3: SAZONALIDADE */}
+        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6 mb-8">
+          <SectionIntro title="Sazonalidade Financeira (O Ciclo do Agro)" icon={Calendar}>
+            <p className="mb-2">
+              <strong>A importância do Timing:</strong> Em Rio Verde, a liquidez do mercado é ditada pelas safras de Soja (Fev/Mar) e Milho (Jul/Ago). 
+              Entender este gráfico é vital para gestão de estoque.
+            </p>
+            <p>
+              Observe a linha verde abaixo: ela representa a entrada de dinheiro na cidade. Planeje lançamentos de alto ticket (como reformas de piscina) nos picos, e promoções de volume (moda) nos vales.
+            </p>
+          </SectionIntro>
+
+          {/* Container do Gráfico com altura responsiva */}
+          <div className="h-[250px] md:h-[300px] w-full mt-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={SEASONALITY_DATA} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{fill: '#64748b', fontSize: 10}} 
+                  interval="preserveStartEnd"
+                />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                  labelStyle={{ color: '#1e293b', fontWeight: 'bold' }}
+                />
+                <Legend verticalAlign="top" height={36} iconType="circle" />
+                <Line 
+                  type="monotone" 
+                  dataKey="cashflow" 
+                  name="Liquidez (Entrada de R$)"
+                  stroke="#22c55e" 
+                  strokeWidth={3} 
+                  dot={{ r: 3, fill: '#22c55e' }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Cards de Timeline: Grid responsivo (2 colunas mobile -> 3 tablet -> 6 desktop) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-4">
+            {SEASONALITY_DATA.map((item) => (
+              <div key={item.month} className="bg-slate-50 p-2 rounded border border-slate-100 text-center hover:bg-indigo-50 transition-colors cursor-default group">
+                <div className="text-xs font-bold text-slate-400 group-hover:text-indigo-600">{item.month}</div>
+                <div className="text-[10px] font-bold text-slate-800 mt-1">{item.event}</div>
+                <div className="text-[9px] text-slate-500 mt-1 leading-tight italic hidden sm:block">{item.strategy}</div>
+                {/* Versão mobile da estratégia (simplificada) */}
+                <div className="text-[9px] text-slate-500 mt-1 leading-tight italic sm:hidden line-clamp-1">{item.strategy}</div>
+              </div>
+            ))}
+          </div>
+          <SourceFooter source={SOURCES.agro} />
+        </section>
+
+      </main>
+    </div>
+  );
+}
