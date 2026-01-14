@@ -149,7 +149,7 @@ const SectionIntro = ({ title, icon: Icon, children }) => (
 );
 
 const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
-  <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between h-full relative group hover:shadow-md transition-shadow">
+  <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between h-full relative group hover:shadow-md transition-shadow overflow-hidden">
     <div className="flex items-start justify-between w-full">
       <div className="p-3 bg-indigo-50 rounded-lg shrink-0">
         <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
@@ -157,7 +157,7 @@ const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
       {tooltip && (
         <div className="relative group/tooltip ml-2">
           <HelpCircle className="w-4 h-4 text-slate-300 cursor-help" />
-          <div className="absolute top-8 right-0 w-40 md:w-48 bg-slate-800 text-white text-[10px] p-2 rounded hidden group-hover/tooltip:block z-20 shadow-xl pointer-events-none">
+          <div className="absolute top-8 right-0 w-40 md:w-48 bg-slate-800 text-white text-[10px] p-2 rounded hidden group-hover/tooltip:block z-30 shadow-xl pointer-events-none">
             {tooltip}
           </div>
         </div>
@@ -166,7 +166,7 @@ const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
     <div className="mt-4 w-full">
       <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 truncate" title={title}>{title}</h3>
       <p className="text-xl md:text-2xl font-bold text-slate-800 mt-1 truncate" title={value}>{value}</p>
-      {subtext && <p className="text-[10px] md:text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2">{subtext}</p>}
+      {subtext && <p className="text-[10px] md:text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2 truncate">{subtext}</p>}
     </div>
   </div>
 );
@@ -247,17 +247,17 @@ const BusinessSimulator = () => {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-8">
+    <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-8 w-full">
       <div className="bg-indigo-900 text-white p-5 flex items-center justify-between">
         <h3 className="text-lg font-bold flex items-center gap-2">
           <Calculator className="w-5 h-5 text-green-400" />
-          Simulador de Viabilidade Econômica
+          Simulador de Viabilidade
         </h3>
         <button 
           onClick={() => {
-            // Reset simples recarregando os estados iniciais (na prática, apenas re-setaríamos)
-            alert("Os valores foram redefinidos para o padrão do estudo.");
-            window.location.reload(); 
+            if(window.confirm("Deseja redefinir os valores para o padrão?")) {
+               window.location.reload();
+            }
           }}
           className="text-xs bg-indigo-800 hover:bg-indigo-700 px-3 py-1 rounded text-indigo-200 flex items-center gap-1 transition-colors"
         >
@@ -275,7 +275,7 @@ const BusinessSimulator = () => {
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-4 h-4 text-indigo-600" />
-                <h4 className="text-sm font-bold text-slate-700 uppercase">CAPEX (Investimento Inicial)</h4>
+                <h4 className="text-sm font-bold text-slate-700 uppercase">CAPEX (Inicial)</h4>
               </div>
               <button onClick={() => addItem(setCapexItems, capexItems)} className="p-1 hover:bg-slate-200 rounded-full text-indigo-600"><Plus className="w-4 h-4" /></button>
             </div>
@@ -286,9 +286,9 @@ const BusinessSimulator = () => {
                     type="text" 
                     value={item.name} 
                     onChange={(e) => updateItem(setCapexItems, capexItems, item.id, 'name', e.target.value)}
-                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none w-full min-w-0"
                   />
-                  <div className="relative w-24">
+                  <div className="relative w-24 shrink-0">
                     <span className="absolute left-2 top-1 text-slate-400">R$</span>
                     <input 
                       type="number" 
@@ -297,12 +297,12 @@ const BusinessSimulator = () => {
                       className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none"
                     />
                   </div>
-                  <button onClick={() => removeItem(setCapexItems, capexItems, item.id)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                  <button onClick={() => removeItem(setCapexItems, capexItems, item.id)} className="text-slate-400 hover:text-red-500 shrink-0"><Trash2 className="w-3 h-3" /></button>
                 </div>
               ))}
             </div>
             <div className="mt-3 text-right text-xs font-bold text-indigo-900 bg-indigo-100 p-2 rounded">
-              Total Investido: {formatCurrency(totalCapex)}
+              Total: {formatCurrency(totalCapex)}
             </div>
           </div>
 
@@ -311,7 +311,7 @@ const BusinessSimulator = () => {
              <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-2">
                 <RefreshCw className="w-4 h-4 text-orange-600" />
-                <h4 className="text-sm font-bold text-slate-700 uppercase">OPEX (Custo Fixo Mensal)</h4>
+                <h4 className="text-sm font-bold text-slate-700 uppercase">OPEX (Mensal)</h4>
               </div>
               <button onClick={() => addItem(setOpexItems, opexItems)} className="p-1 hover:bg-slate-200 rounded-full text-indigo-600"><Plus className="w-4 h-4" /></button>
             </div>
@@ -322,9 +322,9 @@ const BusinessSimulator = () => {
                     type="text" 
                     value={item.name} 
                     onChange={(e) => updateItem(setOpexItems, opexItems, item.id, 'name', e.target.value)}
-                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none w-full min-w-0"
                   />
-                  <div className="relative w-24">
+                  <div className="relative w-24 shrink-0">
                     <span className="absolute left-2 top-1 text-slate-400">R$</span>
                     <input 
                       type="number" 
@@ -333,7 +333,7 @@ const BusinessSimulator = () => {
                       className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none"
                     />
                   </div>
-                  <button onClick={() => removeItem(setOpexItems, opexItems, item.id)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                  <button onClick={() => removeItem(setOpexItems, opexItems, item.id)} className="text-slate-400 hover:text-red-500 shrink-0"><Trash2 className="w-3 h-3" /></button>
                 </div>
               ))}
             </div>
@@ -345,7 +345,7 @@ const BusinessSimulator = () => {
                 <TrendingUp className="w-4 h-4 text-green-600" />
                 <h4 className="text-sm font-bold text-slate-700 uppercase">Projeção de Vendas</h4>
              </div>
-             <div className="grid grid-cols-3 gap-3">
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                <div>
                  <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Ticket Médio (R$)</label>
                  <input 
@@ -382,18 +382,18 @@ const BusinessSimulator = () => {
         <div className="flex flex-col h-full bg-slate-50 rounded-xl border border-slate-200 p-4 md:p-6">
           <h4 className="text-sm font-bold text-slate-800 uppercase mb-4 flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-emerald-600" />
-            Demonstrativo de Resultados (DRE Simplificada)
+            Demonstrativo de Resultados (DRE)
           </h4>
 
           {/* Gráfico Simplificado */}
-          <div className="h-40 w-full mb-6">
+          <div className="h-48 w-full mb-6">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={simulatorData} layout="vertical" margin={{top: 0, right: 30, left: 40, bottom: 0}}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" width={80} tick={{fontSize: 10}} />
-                <RechartsTooltip cursor={{fill: 'transparent'}} formatter={(val) => formatCurrency(val)} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                <YAxis dataKey="name" type="category" width={85} tick={{fontSize: 10}} />
+                <RechartsTooltip cursor={{fill: 'transparent'}} formatter={(val) => formatCurrency(val)} contentStyle={{ zIndex: 50 }} />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={24}>
                   {simulatorData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -432,7 +432,7 @@ const BusinessSimulator = () => {
                <span className="text-xs font-bold text-indigo-600 uppercase">Payback Estimado</span>
                <div className="group relative">
                  <HelpCircle className="w-3 h-3 text-slate-400 cursor-help" />
-                 <div className="absolute bottom-full right-0 w-48 bg-slate-800 text-white text-[9px] p-2 rounded hidden group-hover/block mb-2">
+                 <div className="absolute bottom-full right-0 w-48 bg-slate-800 text-white text-[9px] p-2 rounded hidden group-hover:block mb-2 z-50">
                    Tempo necessário para recuperar o CAPEX com base no Lucro Líquido atual.
                  </div>
                </div>
@@ -473,7 +473,7 @@ export default function RioVerdeMarketApp() {
 
   return (
     // Container Principal: Overflow-x-hidden previne scroll horizontal em mobile
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-8 md:pb-12 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-8 md:pb-12 overflow-x-hidden w-full">
       
       {/* HEADER */}
       <header className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white p-5 md:p-8 shadow-xl w-full">
@@ -681,7 +681,7 @@ export default function RioVerdeMarketApp() {
         </section>
 
         {/* SEÇÃO 3: SAZONALIDADE */}
-        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6 mb-8">
+        <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6 mb-8 w-full">
           <SectionIntro title="Sazonalidade Financeira (O Ciclo do Agro)" icon={Calendar}>
             <p className="mb-2">
               <strong>A importância do Timing:</strong> Em Rio Verde, a liquidez do mercado é ditada pelas safras de Soja (Fev/Mar) e Milho (Jul/Ago). 
@@ -703,7 +703,7 @@ export default function RioVerdeMarketApp() {
                 />
                 <YAxis hide />
                 <RechartsTooltip 
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px', zIndex: 50 }}
                   labelStyle={{ color: '#1e293b', fontWeight: 'bold' }}
                 />
                 <Legend verticalAlign="top" height={36} iconType="circle" />
@@ -734,7 +734,7 @@ export default function RioVerdeMarketApp() {
         </section>
 
         {/* SEÇÃO 4: SIMULADOR DE NEGÓCIOS (NOVO) */}
-        <section>
+        <section className="w-full">
           <SectionIntro title="Modele seu Negócio (Simulador de Viabilidade)" icon={Calculator}>
             <p>
               <strong>Didática Financeira:</strong> Use esta ferramenta para projetar a saúde financeira do seu negócio em Rio Verde.
