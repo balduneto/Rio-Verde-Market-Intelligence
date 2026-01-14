@@ -1,43 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   MapPin, 
   Droplets, 
   Dumbbell, 
-  TrendingUp, 
   Users, 
   DollarSign, 
-  Sun, 
   Calendar,
   Info,
-  CheckCircle,
   Target,
   BookOpen,
   HelpCircle,
   FileText,
-  Menu,
-  ChevronDown
+  Calculator,
+  Plus,
+  Trash2,
+  RefreshCw,
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
 import { 
-  BarChart, 
-  Bar, 
+  LineChart,
+  Line,
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip, 
+  Tooltip as RechartsTooltip, 
   ResponsiveContainer,
-  LineChart,
-  Line,
-  Legend
+  Legend,
+  BarChart,
+  Bar,
+  Cell
 } from 'recharts';
 
-// --- DADOS E FONTES CONSOLIDADOS ---
-// Estrutura de dados imutável para garantir integridade das referências
+/**
+ * --- DADOS E FONTES ---
+ */
 
 const SOURCES = {
   demografia: "Fonte: IBGE (Censo 2022) e Estimativas Populacionais (2024).",
   economia: "Fonte: IMB (Instituto Mauro Borges) e IPC Maps (2024).",
-  zoneamento: "Fonte: Plano Diretor de Rio Verde e RAIS (Relação Anual de Informações Sociais 2023).",
-  agro: "Fonte: CONAB (Calendário de Safra 23/24) e Sindicato Rural de Rio Verde.",
+  zoneamento: "Fonte: Plano Diretor de Rio Verde e RAIS (2023).",
+  agro: "Fonte: CONAB (Safra 23/24) e Sindicato Rural de Rio Verde.",
   periodo: "Ref: Dados consolidados Q4/2024."
 };
 
@@ -122,22 +125,24 @@ const SEASONALITY_DATA = [
   { month: 'Dez', cashflow: 85, event: 'Festas / Férias', strategy: 'Moda Praia / Presentes' },
 ];
 
-// --- COMPONENTES VISUAIS REUTILIZÁVEIS E RESPONSIVOS ---
+/**
+ * --- COMPONENTES VISUAIS ---
+ */
 
 const SourceFooter = ({ source, period }) => (
-  <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center text-[10px] text-slate-400 font-medium font-mono gap-2">
-    <span className="flex items-center gap-1"><FileText className="w-3 h-3" /> {source}</span>
-    <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500 whitespace-nowrap">{period || SOURCES.periodo}</span>
+  <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center text-[10px] text-slate-400 font-medium font-mono gap-2 w-full">
+    <span className="flex items-center gap-1 shrink-0"><FileText className="w-3 h-3" /> {source}</span>
+    <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500 whitespace-nowrap text-[9px] sm:text-[10px]">{period || SOURCES.periodo}</span>
   </div>
 );
 
 const SectionIntro = ({ title, icon: Icon, children }) => (
-  <div className="mb-6 bg-white p-5 rounded-lg border-l-4 border-indigo-500 shadow-sm">
+  <div className="mb-6 bg-white p-4 md:p-5 rounded-lg border-l-4 border-indigo-500 shadow-sm w-full">
     <h2 className="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2 mb-3">
       <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600 flex-shrink-0" />
       {title}
     </h2>
-    <div className="text-slate-600 text-xs md:text-sm leading-relaxed max-w-none md:max-w-4xl text-justify">
+    <div className="text-slate-600 text-xs md:text-sm leading-relaxed text-justify">
       {children}
     </div>
   </div>
@@ -145,30 +150,29 @@ const SectionIntro = ({ title, icon: Icon, children }) => (
 
 const MainCard = ({ title, value, icon: Icon, subtext, tooltip }) => (
   <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between h-full relative group hover:shadow-md transition-shadow">
-    <div className="flex items-start justify-between">
-      <div className="p-3 bg-indigo-50 rounded-lg">
+    <div className="flex items-start justify-between w-full">
+      <div className="p-3 bg-indigo-50 rounded-lg shrink-0">
         <Icon className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
       </div>
       {tooltip && (
-        <div className="relative group/tooltip">
+        <div className="relative group/tooltip ml-2">
           <HelpCircle className="w-4 h-4 text-slate-300 cursor-help" />
-          {/* Tooltip adaptado para mobile (esquerda) e desktop (direita) */}
-          <div className="absolute top-full right-0 mt-2 w-48 bg-slate-800 text-white text-[10px] p-2 rounded hidden group-hover/tooltip:block z-10 shadow-xl pointer-events-none">
+          <div className="absolute top-8 right-0 w-40 md:w-48 bg-slate-800 text-white text-[10px] p-2 rounded hidden group-hover/tooltip:block z-20 shadow-xl pointer-events-none">
             {tooltip}
           </div>
         </div>
       )}
     </div>
-    <div className="mt-4">
-      <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500">{title}</h3>
-      <p className="text-xl md:text-2xl font-bold text-slate-800 mt-1">{value}</p>
+    <div className="mt-4 w-full">
+      <h3 className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 truncate" title={title}>{title}</h3>
+      <p className="text-xl md:text-2xl font-bold text-slate-800 mt-1 truncate" title={value}>{value}</p>
       {subtext && <p className="text-[10px] md:text-xs text-slate-400 mt-2 border-t border-slate-100 pt-2">{subtext}</p>}
     </div>
   </div>
 );
 
 const ProgressBar = ({ label, value, colorClass }) => (
-  <div className="mb-4">
+  <div className="mb-4 last:mb-0">
     <div className="flex justify-between mb-1">
       <span className="text-xs md:text-sm font-medium text-slate-700">{label}</span>
       <span className="text-xs md:text-sm font-medium text-slate-700">{value}%</span>
@@ -179,6 +183,286 @@ const ProgressBar = ({ label, value, colorClass }) => (
   </div>
 );
 
+/**
+ * --- SIMULADOR COMPONENT ---
+ */
+const BusinessSimulator = () => {
+  // Estado Inicial para CAPEX (Investimento Inicial)
+  const [capexItems, setCapexItems] = useState([
+    { id: 1, name: 'Reforma / Ponto', value: 15000 },
+    { id: 2, name: 'Estoque Inicial', value: 30000 },
+    { id: 3, name: 'Marketing Lançamento', value: 5000 },
+    { id: 4, name: 'Equipamentos', value: 10000 },
+  ]);
+
+  // Estado Inicial para OPEX (Custo Fixo Mensal)
+  const [opexItems, setOpexItems] = useState([
+    { id: 1, name: 'Aluguel + Cond.', value: 3500 },
+    { id: 2, name: 'Salários + Encargos', value: 4500 },
+    { id: 3, name: 'Internet/Luz/Água', value: 600 },
+    { id: 4, name: 'Marketing Mensal', value: 1000 },
+  ]);
+
+  // Estado para Receita
+  const [revenue, setRevenue] = useState({
+    avgTicket: 250, // Ticket Médio
+    volume: 80, // Vendas por mês
+    variableCostPct: 40 // Custo Variável (%) - Custo da Mercadoria Vendida + Impostos
+  });
+
+  // Funções Auxiliares
+  const formatCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+  
+  const addItem = (setter, list) => {
+    const newId = list.length > 0 ? Math.max(...list.map(i => i.id)) + 1 : 1;
+    setter([...list, { id: newId, name: 'Novo Item', value: 0 }]);
+  };
+
+  const removeItem = (setter, list, id) => {
+    setter(list.filter(item => item.id !== id));
+  };
+
+  const updateItem = (setter, list, id, field, value) => {
+    setter(list.map(item => item.id === id ? { ...item, [field]: field === 'value' ? Number(value) : value } : item));
+  };
+
+  // Cálculos Financeiros
+  const totalCapex = capexItems.reduce((acc, item) => acc + item.value, 0);
+  const totalFixedOpex = opexItems.reduce((acc, item) => acc + item.value, 0);
+  
+  const grossRevenue = revenue.avgTicket * revenue.volume;
+  const variableCost = grossRevenue * (revenue.variableCostPct / 100);
+  const contributionMargin = grossRevenue - variableCost;
+  const netProfit = contributionMargin - totalFixedOpex;
+  
+  const paybackMonths = netProfit > 0 ? totalCapex / netProfit : 0;
+  const paybackYears = paybackMonths / 12;
+
+  // Gráfico do Simulador
+  const simulatorData = [
+    { name: 'Receita Bruta', value: grossRevenue, color: '#22c55e' }, // Green
+    { name: 'Custo Variável', value: variableCost, color: '#f59e0b' }, // Amber
+    { name: 'Custo Fixo', value: totalFixedOpex, color: '#ef4444' }, // Red
+    { name: 'Lucro Líq.', value: netProfit > 0 ? netProfit : 0, color: '#3b82f6' } // Blue
+  ];
+
+  return (
+    <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-8">
+      <div className="bg-indigo-900 text-white p-5 flex items-center justify-between">
+        <h3 className="text-lg font-bold flex items-center gap-2">
+          <Calculator className="w-5 h-5 text-green-400" />
+          Simulador de Viabilidade Econômica
+        </h3>
+        <button 
+          onClick={() => {
+            // Reset simples recarregando os estados iniciais (na prática, apenas re-setaríamos)
+            alert("Os valores foram redefinidos para o padrão do estudo.");
+            window.location.reload(); 
+          }}
+          className="text-xs bg-indigo-800 hover:bg-indigo-700 px-3 py-1 rounded text-indigo-200 flex items-center gap-1 transition-colors"
+        >
+          <RefreshCw className="w-3 h-3" /> Reset
+        </button>
+      </div>
+
+      <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* COLUNA ESQUERDA: INPUTS */}
+        <div className="space-y-6">
+          
+          {/* CAPEX */}
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-indigo-600" />
+                <h4 className="text-sm font-bold text-slate-700 uppercase">CAPEX (Investimento Inicial)</h4>
+              </div>
+              <button onClick={() => addItem(setCapexItems, capexItems)} className="p-1 hover:bg-slate-200 rounded-full text-indigo-600"><Plus className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+              {capexItems.map((item) => (
+                <div key={item.id} className="flex gap-2 items-center text-xs">
+                  <input 
+                    type="text" 
+                    value={item.name} 
+                    onChange={(e) => updateItem(setCapexItems, capexItems, item.id, 'name', e.target.value)}
+                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  />
+                  <div className="relative w-24">
+                    <span className="absolute left-2 top-1 text-slate-400">R$</span>
+                    <input 
+                      type="number" 
+                      value={item.value} 
+                      onChange={(e) => updateItem(setCapexItems, capexItems, item.id, 'value', e.target.value)}
+                      className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none"
+                    />
+                  </div>
+                  <button onClick={() => removeItem(setCapexItems, capexItems, item.id)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 text-right text-xs font-bold text-indigo-900 bg-indigo-100 p-2 rounded">
+              Total Investido: {formatCurrency(totalCapex)}
+            </div>
+          </div>
+
+          {/* OPEX */}
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+             <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 text-orange-600" />
+                <h4 className="text-sm font-bold text-slate-700 uppercase">OPEX (Custo Fixo Mensal)</h4>
+              </div>
+              <button onClick={() => addItem(setOpexItems, opexItems)} className="p-1 hover:bg-slate-200 rounded-full text-indigo-600"><Plus className="w-4 h-4" /></button>
+            </div>
+            <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+              {opexItems.map((item) => (
+                <div key={item.id} className="flex gap-2 items-center text-xs">
+                  <input 
+                    type="text" 
+                    value={item.name} 
+                    onChange={(e) => updateItem(setOpexItems, opexItems, item.id, 'name', e.target.value)}
+                    className="flex-1 border border-slate-300 rounded px-2 py-1 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  />
+                  <div className="relative w-24">
+                    <span className="absolute left-2 top-1 text-slate-400">R$</span>
+                    <input 
+                      type="number" 
+                      value={item.value} 
+                      onChange={(e) => updateItem(setOpexItems, opexItems, item.id, 'value', e.target.value)}
+                      className="w-full pl-7 border border-slate-300 rounded px-2 py-1 text-right outline-none"
+                    />
+                  </div>
+                  <button onClick={() => removeItem(setOpexItems, opexItems, item.id)} className="text-slate-400 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* VARIÁVEIS DE VENDA */}
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+             <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4 text-green-600" />
+                <h4 className="text-sm font-bold text-slate-700 uppercase">Projeção de Vendas</h4>
+             </div>
+             <div className="grid grid-cols-3 gap-3">
+               <div>
+                 <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Ticket Médio (R$)</label>
+                 <input 
+                    type="number" 
+                    value={revenue.avgTicket} 
+                    onChange={(e) => setRevenue({...revenue, avgTicket: Number(e.target.value)})}
+                    className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm"
+                  />
+               </div>
+               <div>
+                 <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Qtd. Vendas/Mês</label>
+                 <input 
+                    type="number" 
+                    value={revenue.volume} 
+                    onChange={(e) => setRevenue({...revenue, volume: Number(e.target.value)})}
+                    className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm"
+                  />
+               </div>
+               <div>
+                 <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Custo Variável (%)</label>
+                 <input 
+                    type="number" 
+                    value={revenue.variableCostPct} 
+                    onChange={(e) => setRevenue({...revenue, variableCostPct: Number(e.target.value)})}
+                    className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm"
+                  />
+               </div>
+             </div>
+          </div>
+
+        </div>
+
+        {/* COLUNA DIREITA: RESULTADOS */}
+        <div className="flex flex-col h-full bg-slate-50 rounded-xl border border-slate-200 p-4 md:p-6">
+          <h4 className="text-sm font-bold text-slate-800 uppercase mb-4 flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-emerald-600" />
+            Demonstrativo de Resultados (DRE Simplificada)
+          </h4>
+
+          {/* Gráfico Simplificado */}
+          <div className="h-40 w-full mb-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={simulatorData} layout="vertical" margin={{top: 0, right: 30, left: 40, bottom: 0}}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" width={80} tick={{fontSize: 10}} />
+                <RechartsTooltip cursor={{fill: 'transparent'}} formatter={(val) => formatCurrency(val)} />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                  {simulatorData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="space-y-3 flex-1">
+             <div className="flex justify-between text-xs border-b border-slate-200 pb-2">
+               <span className="text-slate-600">Receita Bruta Mensal</span>
+               <span className="font-bold text-slate-800">{formatCurrency(grossRevenue)}</span>
+             </div>
+             <div className="flex justify-between text-xs border-b border-slate-200 pb-2">
+               <span className="text-slate-600">(-) Custo Variável ({revenue.variableCostPct}%)</span>
+               <span className="font-medium text-orange-600">{formatCurrency(variableCost)}</span>
+             </div>
+             <div className="flex justify-between text-xs border-b border-slate-200 pb-2">
+               <span className="text-slate-600">(=) Margem de Contribuição</span>
+               <span className="font-medium text-slate-800">{formatCurrency(contributionMargin)}</span>
+             </div>
+             <div className="flex justify-between text-xs border-b border-slate-200 pb-2">
+               <span className="text-slate-600">(-) Custo Fixo (OPEX)</span>
+               <span className="font-medium text-red-600">{formatCurrency(totalFixedOpex)}</span>
+             </div>
+             
+             <div className={`flex justify-between text-sm p-3 rounded-lg mt-2 ${netProfit > 0 ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900'}`}>
+               <span className="font-bold uppercase">Lucro Líquido Mensal</span>
+               <span className="font-bold">{formatCurrency(netProfit)}</span>
+             </div>
+          </div>
+
+          {/* KPI PAYBACK */}
+          <div className="mt-6 pt-4 border-t-2 border-dashed border-slate-300">
+             <div className="flex items-center gap-2 mb-2">
+               <span className="text-xs font-bold text-indigo-600 uppercase">Payback Estimado</span>
+               <div className="group relative">
+                 <HelpCircle className="w-3 h-3 text-slate-400 cursor-help" />
+                 <div className="absolute bottom-full right-0 w-48 bg-slate-800 text-white text-[9px] p-2 rounded hidden group-hover:block mb-2">
+                   Tempo necessário para recuperar o CAPEX com base no Lucro Líquido atual.
+                 </div>
+               </div>
+             </div>
+             
+             {netProfit > 0 ? (
+               <div className="flex items-baseline gap-2">
+                 <span className="text-3xl font-black text-slate-800">{paybackMonths.toFixed(1)}</span>
+                 <span className="text-sm font-medium text-slate-500">meses</span>
+                 <span className="text-xs text-slate-400 ml-2">({paybackYears.toFixed(1)} anos)</span>
+               </div>
+             ) : (
+               <div className="flex items-center gap-2 text-red-500 bg-red-50 p-2 rounded text-xs">
+                 <AlertCircle className="w-4 h-4" />
+                 <span>Operação no prejuízo. Payback incalculável.</span>
+               </div>
+             )}
+          </div>
+        </div>
+
+      </div>
+      
+      <div className="bg-slate-100 p-3 text-[10px] text-slate-500 text-center border-t border-slate-200">
+        * Simulação simplificada para fins didáticos. Não substitui plano de negócios formal. Impostos considerados no Custo Variável.
+      </div>
+    </div>
+  );
+};
+
+
 export default function RioVerdeMarketApp() {
   const [activeZone, setActiveZone] = useState(ZONES[0]);
   const [filterClass, setFilterClass] = useState('all');
@@ -188,28 +472,30 @@ export default function RioVerdeMarketApp() {
     : ZONES.filter(z => z.class.includes(filterClass));
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-8 md:pb-12">
+    // Container Principal: Overflow-x-hidden previne scroll horizontal em mobile
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-8 md:pb-12 overflow-x-hidden">
       
-      {/* HEADER RESPONSIVO */}
-      <header className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white p-6 md:p-8 shadow-xl">
-        <div className="max-w-7xl mx-auto">
+      {/* HEADER */}
+      <header className="bg-gradient-to-r from-indigo-900 to-blue-900 text-white p-5 md:p-8 shadow-xl w-full">
+        <div className="max-w-7xl mx-auto w-full">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
+            <div className="w-full md:w-auto">
               <div className="flex items-center gap-2 mb-2">
                 <span className="bg-green-400 text-indigo-900 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                   Mapeamento Sócio-Econômico
                 </span>
               </div>
-              <h1 className="text-2xl md:text-4xl font-bold flex items-center gap-2 md:gap-3 leading-tight">
-                Inteligência de Mercado: <br className="md:hidden" /> Rio Verde (GO)
+              <h1 className="text-2xl md:text-4xl font-bold flex flex-wrap items-center gap-2 leading-tight">
+                Inteligência de Mercado
+                <span className="block w-full md:w-auto md:inline text-indigo-200 text-lg md:text-3xl font-light">| Rio Verde (GO)</span>
               </h1>
-              <p className="text-indigo-200 mt-2 max-w-2xl text-xs md:text-sm leading-relaxed">
-                Um estudo de caso interativo sobre o consumo de <strong>Ionizadores de Piscina</strong> e <strong>Moda Fitness</strong>, cruzando dados de renda, demografia e sazonalidade do agronegócio.
+              <p className="text-indigo-200 mt-2 w-full md:max-w-2xl text-xs md:text-sm leading-relaxed">
+                Estudo interativo: <strong>Ionizadores de Piscina</strong> e <strong>Moda Fitness</strong> x Renda e Safra.
               </p>
             </div>
             
-            {/* KPI Destaque Header - Adaptado para Mobile */}
-            <div className="w-full md:w-auto mt-2 md:mt-0 bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/10 flex md:block items-center justify-between md:text-right">
+            {/* KPI Destaque Header */}
+            <div className="w-full md:w-auto mt-2 md:mt-0 bg-white/10 p-4 rounded-lg backdrop-blur-sm border border-white/10 flex md:block items-center justify-between">
               <div className="text-left md:text-right">
                 <div className="text-[10px] text-indigo-200 uppercase tracking-widest mb-1">Destaque Nacional</div>
                 <div className="text-[10px] text-white">PIB per Capita (IMB 2024)</div>
@@ -222,81 +508,73 @@ export default function RioVerdeMarketApp() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 md:space-y-12">
+      <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 md:space-y-12 w-full">
         
-        {/* SEÇÃO 1: CONTEXTO MACROECONÔMICO */}
-        <section>
+        {/* SEÇÃO 1: MACRO */}
+        <section className="w-full">
           <SectionIntro title="Panorama Macroeconômico e Demográfico" icon={BookOpen}>
             <p className="mb-2">
-              <strong>Contextualização Didática:</strong> Antes de definirmos <em>onde</em> vender, precisamos entender o <em>tamanho do prêmio</em> (TAM - Total Addressable Market). 
-              Os dados abaixo não são números aleatórios; eles comprovam a robustez financeira de Rio Verde.
-            </p>
-            <p>
-              O alto PIB per capita, impulsionado pelo agronegócio, cria uma classe média expandida com alta propensão ao consumo de itens de bem-estar (piscinas) e estética (fitness), tornando a cidade um "oásis" de consumo no Centro-Oeste.
+              <strong>Contextualização Didática:</strong> O "Tamanho do Prêmio" (TAM). Antes de definir <em>onde</em> vender, validamos a capacidade de compra. 
+              Rio Verde possui uma classe média robusta, impulsionada pelo Agro, com alta propensão ao consumo de bem-estar.
             </p>
           </SectionIntro>
           
-          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200">
-            {/* Grid adaptável: 1 coluna no celular, 2 no tablet, 4 no desktop */}
+          <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-slate-200 w-full">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <MainCard 
                 title="População Estimada" 
                 value={CITY_STATS.populacao} 
                 icon={Users} 
                 subtext="Predominância: 20-55 anos (PEA)"
-                tooltip="Refere-se ao total de habitantes residentes fixos. Uma PEA (População Economicamente Ativa) jovem impulsiona o mercado fitness."
+                tooltip="Base populacional economicamente ativa. Fundamental para mercado de academias."
               />
               <MainCard 
                 title="Potencial de Consumo" 
                 value={CITY_STATS.potencialConsumo} 
                 icon={DollarSign} 
-                subtext="4º Maior Mercado de Goiás"
-                tooltip="IPC (Índice de Potencial de Consumo): Valor monetário total disponível para gastos das famílias no ano."
+                subtext="4º Maior Mercado de GO"
+                tooltip="IPC Maps: Volume total disponível para gastos das famílias no ano."
               />
               <MainCard 
-                title="Público-Alvo Piscinas" 
+                title="Público Piscinas" 
                 value="Classe A/B" 
                 icon={Droplets} 
                 subtext="Alta densidade horizontal"
-                tooltip="Forte presença de condomínios horizontais fechados favorece a venda de tecnologia para tratamento de água."
+                tooltip="Condomínios horizontais são o foco para venda de tecnologia (Íons)."
               />
               <MainCard 
                 title="Público Fitness" 
                 value="Multiclasse" 
                 icon={Dumbbell} 
                 subtext="Adesão cultural elevada"
-                tooltip="O 'corpo' é um ativo social em Rio Verde. O mercado fitness atravessa todas as classes, variando apenas o ticket médio."
+                tooltip="O mercado fitness atravessa todas as classes, variando apenas o ticket."
               />
             </div>
             <SourceFooter source={`${SOURCES.demografia} | ${SOURCES.economia}`} />
           </div>
         </section>
 
-        {/* SEÇÃO 2: GEOGRAFIA INTELIGENTE */}
-        <section>
-          <SectionIntro title="Geografia do Consumo (Zoneamento Sócio-Econômico)" icon={MapPin}>
+        {/* SEÇÃO 2: GEOGRAFIA (GRID RESPONSIVO) */}
+        <section className="w-full">
+          <SectionIntro title="Geografia do Consumo (Zoneamento)" icon={MapPin}>
             <p className="mb-2">
-              <strong>Como interpretar este mapa?</strong> Rio Verde não é homogênea. Para ser eficiente, aplicamos o conceito de <em>Clusterização</em>.
-              Dividimos a cidade em zonas baseadas na renda média e estilo de vida.
+              <strong>Clusterização Inteligente:</strong> Dividimos a cidade em zonas de calor baseadas na renda.
+              Cada zona exige uma abordagem: a <strong>Zona A</strong> busca exclusividade tecnológica; a <strong>Zona C</strong> busca estética e pertencimento.
             </p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-500 text-xs md:text-sm">
-              <li><strong>Zonas A/B:</strong> Foco em tecnologia, conforto e exclusividade (Piscinas).</li>
-              <li><strong>Zonas B/C:</strong> Foco em tendências, pertencimento e custo-benefício (Moda Fitness).</li>
-            </ul>
-            <p className="text-xs text-indigo-800 bg-indigo-50 px-3 py-2 rounded inline-block mt-3 border border-indigo-100 w-full md:w-auto">
-              <span className="font-bold">Interação:</span> Clique nos cartões dos bairros abaixo para revelar o Pitch de Vendas ideal.
+            <p className="text-xs text-indigo-800 bg-indigo-50 px-3 py-2 rounded inline-block mt-2 w-full md:w-auto">
+              <span className="font-bold">Interação:</span> Clique nos bairros abaixo para ver o Pitch de Vendas.
             </p>
           </SectionIntro>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            {/* ESQUERDA: SELETOR DE ZONAS */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 w-full">
+            {/* ESQUERDA: MAPA LÓGICO */}
             <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col order-2 lg:order-1">
               <div className="p-4 border-b border-slate-100 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                    Selecione a Região
                 </span>
                 
-                {/* Filtros Mobile-Friendly: Wrap flexível */}
+                {/* Filtros Mobile: Flex Wrap para não quebrar layout */}
                 <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   {['all', 'A', 'B', 'C'].map((cls) => (
                     <button
@@ -322,12 +600,12 @@ export default function RioVerdeMarketApp() {
                       onClick={() => setActiveZone(zone)}
                       className={`relative p-4 md:p-5 rounded-xl border-2 text-left transition-all duration-300 group ${
                         activeZone.id === zone.id 
-                          ? 'border-indigo-600 bg-white shadow-lg ring-1 ring-indigo-100 transform scale-[1.02]' 
+                          ? 'border-indigo-600 bg-white shadow-lg ring-1 ring-indigo-100 transform scale-[1.01]' 
                           : 'border-white bg-white hover:border-indigo-300 hover:shadow-md'
                       }`}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div className={`w-3 h-3 rounded-full ${zone.color}`} title="Identificador de Zona"></div>
+                        <div className={`w-3 h-3 rounded-full ${zone.color} shrink-0`} title="Cor Zona"></div>
                         <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded border border-slate-200">
                           Renda: {zone.income}
                         </span>
@@ -409,9 +687,6 @@ export default function RioVerdeMarketApp() {
               <strong>A importância do Timing:</strong> Em Rio Verde, a liquidez do mercado é ditada pelas safras de Soja (Fev/Mar) e Milho (Jul/Ago). 
               Entender este gráfico é vital para gestão de estoque.
             </p>
-            <p>
-              Observe a linha verde abaixo: ela representa a entrada de dinheiro na cidade. Planeje lançamentos de alto ticket (como reformas de piscina) nos picos, e promoções de volume (moda) nos vales.
-            </p>
           </SectionIntro>
 
           {/* Container do Gráfico com altura responsiva */}
@@ -427,7 +702,7 @@ export default function RioVerdeMarketApp() {
                   interval="preserveStartEnd"
                 />
                 <YAxis hide />
-                <Tooltip 
+                <RechartsTooltip 
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
                   labelStyle={{ color: '#1e293b', fontWeight: 'bold' }}
                 />
@@ -445,19 +720,33 @@ export default function RioVerdeMarketApp() {
             </ResponsiveContainer>
           </div>
 
-          {/* Cards de Timeline: Grid responsivo (2 colunas mobile -> 3 tablet -> 6 desktop) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mt-4">
             {SEASONALITY_DATA.map((item) => (
               <div key={item.month} className="bg-slate-50 p-2 rounded border border-slate-100 text-center hover:bg-indigo-50 transition-colors cursor-default group">
                 <div className="text-xs font-bold text-slate-400 group-hover:text-indigo-600">{item.month}</div>
                 <div className="text-[10px] font-bold text-slate-800 mt-1">{item.event}</div>
                 <div className="text-[9px] text-slate-500 mt-1 leading-tight italic hidden sm:block">{item.strategy}</div>
-                {/* Versão mobile da estratégia (simplificada) */}
                 <div className="text-[9px] text-slate-500 mt-1 leading-tight italic sm:hidden line-clamp-1">{item.strategy}</div>
               </div>
             ))}
           </div>
           <SourceFooter source={SOURCES.agro} />
+        </section>
+
+        {/* SEÇÃO 4: SIMULADOR DE NEGÓCIOS (NOVO) */}
+        <section>
+          <SectionIntro title="Modele seu Negócio (Simulador de Viabilidade)" icon={Calculator}>
+            <p>
+              <strong>Didática Financeira:</strong> Use esta ferramenta para projetar a saúde financeira do seu negócio em Rio Verde.
+            </p>
+            <ul className="list-disc list-inside mt-2 space-y-1 text-slate-500 text-xs md:text-sm">
+              <li><strong>CAPEX (Capital Expenditure):</strong> Dinheiro que você gasta <em>uma vez</em> para abrir o negócio (Reformas, Equipamentos).</li>
+              <li><strong>OPEX (Operational Expenditure):</strong> Dinheiro que você gasta <em>todo mês</em> para manter as portas abertas (Aluguel, Luz, Pessoal).</li>
+              <li><strong>Payback:</strong> Tempo (em meses) que o lucro do negócio leva para "pagar" o investimento inicial.</li>
+            </ul>
+          </SectionIntro>
+          
+          <BusinessSimulator />
         </section>
 
       </main>
